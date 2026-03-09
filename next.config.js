@@ -9,6 +9,7 @@ const nextConfig = {
 const _nextConfigFinal = {
   ...nextConfig,
   typescript: { ignoreBuildErrors: true },
+  output: 'standalone',
   eslint: { ignoreDuringBuilds: true },
 };
 
