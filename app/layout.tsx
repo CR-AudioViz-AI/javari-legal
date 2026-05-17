@@ -1,18 +1,34 @@
+// app/layout.tsx — Javari Legal
+// Fortune 50 quality — uses AppShell for full ecosystem integration
+// May 17, 2026 — CR AudioViz AI, LLC
 import type { Metadata } from 'next'
 import './globals.css'
-import EcosystemNav from '@/components/ecosystem/EcosystemNav'
-import EcosystemFooter from '@/components/ecosystem/EcosystemFooter'
-
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Javari Legal | Professional Legal Documents & Templates',
-  description: 'Create professional legal documents in minutes. Contracts, NDAs, agreements, and more - attorney-drafted templates.',
+  title: 'Javari Legal | Javari by CR AudioViz AI',
+  description: 'AI legal documents',
+  keywords: 'Javari Legal, Javari, AI, CR AudioViz AI',
 }
+
+import AppShell from '@/components/AppShell'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body><EcosystemNav appName="Javari Legal" />{children}<EcosystemFooter /></body>
+      <body style={{ margin: 0, padding: 0 }}>
+        <AppShell
+          appName="Javari Legal"
+          appColor="#8b5cf6"
+          appEmoji="⚖️"
+          appDesc="AI legal documents"
+      handoffApp="Javari Formation"
+      handoffUrl="https://javari-business-formation.vercel.app"
+      handoffPitch="Got your legal docs? Now form your business →"
+        >
+          {children}
+        </AppShell>
+      </body>
     </html>
   )
 }
