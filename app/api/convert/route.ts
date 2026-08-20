@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { deductCredits } from '@/lib/credits'
+import { requireUser } from '@/lib/api/require-user'
 import mammoth from 'mammoth'
 import { OpenAI } from 'openai'
 
@@ -18,10 +19,16 @@ const CREDIT_COSTS = {
 
 export async function POST(request: NextRequest) {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // 2026-08-20: this called supabase.auth.getUser() with NO ARGUMENT on a
+    // service-role client. That client has no session and no cookies, so it
+    // returned null on every request and this endpoint answered 401 to everyone -
+    // document conversion has never worked for anybody.
+    //
+    // The access token arrives in the Authorization header, because sessions live
+    // in localStorage on this platform. requireUser verifies it with Supabase.
+    const auth = await requireUser(request)
+    if (!auth.ok) return auth.res
+    const user = { id: auth.userId, email: auth.email }
 
     const formData = await request.formData()
     const file = formData.get('file') as File
