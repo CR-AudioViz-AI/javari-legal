@@ -4,11 +4,12 @@ import { deductCredits } from '@/lib/credits'
 import { requireUser } from '@/lib/api/require-user'
 import mammoth from 'mammoth'
 import { OpenAI } from 'openai'
+import { secretKey, supabaseUrl } from "@craudioviz/platform-sdk";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  supabaseUrl(),
+  secretKey()
 )
 
 const CREDIT_COSTS = {
