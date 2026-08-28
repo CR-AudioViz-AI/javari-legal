@@ -17,7 +17,8 @@
     "@supabase/supabase-js": "^2",
     "@supabase/ssr": "^0.5",
     "mammoth": "^1.9.0",
-    "openai": "^4.0.0"
+    "openai": "^4.0.0",
+    "@craudioviz/platform-sdk": "git+https://github.com/CR-AudioViz-AI/platform-sdk.git"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
