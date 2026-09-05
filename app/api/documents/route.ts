@@ -2,17 +2,54 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { secretKey, supabaseUrl } from "@craudioviz/platform-sdk";
 
+
+/**
+ * 2026-09-06: the caller's identity comes from their token, never from the request.
+ *
+ * This route took a user id from the caller and used it against a client built
+ * with secretKey() - the service-role credential - which bypasses row level
+ * security entirely, so it acted on whichever account the caller named.
+ *
+ * Found by the census: 1,657 routes enumerated across the estate, this one among
+ * the 1,257 no hand-built list had ever contained.
+ *
+ * The gate builds its own client rather than assuming a helper exists. The first
+ * version of this repair assumed a getSupabase() function and silently matched
+ * nothing in six of the ten routes it was meant to fix - a repair that does not
+ * apply is worse than one that fails loudly, because the report still says the
+ * defect was addressed.
+ */
+async function __callerId(request: Request): Promise<string | null> {
+  const header = request.headers.get('authorization') ?? '';
+  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : null;
+  if (!token) return null;
+  try {
+    const sb = createClient(supabaseUrl(), secretKey(), {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await sb.auth.getUser(token);
+    if (error || !data?.user) return null;
+    return data.user.id as string;
+  } catch {
+    return null;
+  }
+}
+
+function __unauthorised() {
+  return NextResponse.json(
+    { error: 'Sign in required.', code: 'AUTH_REQUIRED' },
+    { status: 401 },
+  );
+}
+
 export async function POST(request: Request) {
   try {
-    const { 
-      userId, 
-      title, 
+    const {title, 
       originalContent, 
       convertedContent,
-      documentType = 'other'
-    } = await request.json()
-
-    if (!userId || !title || !originalContent) {
+      documentType = 'other'} = await request.json();
+    const userId = await __callerId(request);
+    if (!userId) return __unauthorised();if (!userId || !title || !originalContent) {
       return NextResponse.json(
         { error: 'Missing required fields' }, 
         { status: 400 }
@@ -89,9 +126,8 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
-
-    if (!userId) {
+    const userId = await __callerId(request);
+    if (!userId) return __unauthorised();if (!userId) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 })
     }
 
