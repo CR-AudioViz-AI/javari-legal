@@ -41,7 +41,7 @@ const TEMPLATES = {
 
 async function aiGenerate(prompt: string): Promise<string> {
   const providers = [
-    { url: 'https://api.groq.com/openai/v1/chat/completions', key: GROQ, model: 'llama-3.3-70b-versatile' },
+    { url: 'https://api.groq.com/openai/v1/chat/completions', key: GROQ, model: 'openai/gpt-oss-120b' },
     { url: 'https://openrouter.ai/api/v1/chat/completions', key: OR, model: 'deepseek/deepseek-r1-distill-llama-70b:free' },
   ]
   for (const p of providers) {
