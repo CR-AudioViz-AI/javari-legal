@@ -1,4 +1,4 @@
-import AdminDashboardLayout from '@/components/admin/AdminDashboardLayout'
+import { AdminDashboardLayout } from '@/components/admin/AdminDashboardLayout'
 import { BarChart3, Building2, Users, FileText, CheckCircle } from 'lucide-react'
 
 export default function AdminOverview() {
